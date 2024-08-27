@@ -1,0 +1,10 @@
+[alfred]
+url = "tcp://127.0.0.1"
+pub_port = "5678"
+sub_port = "1234"
+
+[wake-word]
+porcupine_access_key = ""
+ppn_model = "models/alfred_it_mac_v3_0_0.ppn"
+lang_model = "models/porcupine_params_it.pv"
+callback_topic = "mic"

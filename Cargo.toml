@@ -1,0 +1,10 @@
+[package]
+name = "alfred-wake-word"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pv_porcupine = "3.0.3"
+pv_recorder = "1.2.2"
+alfred-rs = { path = "../alfred-rs" }
+env_logger = "0.11.5"
