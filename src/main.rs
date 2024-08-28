@@ -5,7 +5,7 @@ use alfred_rs::interface_module::InterfaceModule;
 use alfred_rs::log::debug;
 use alfred_rs::message::{Message, MessageType};
 use alfred_rs::tokio;
-use porcupine::{Porcupine, PorcupineBuilder};
+use porcupine::PorcupineBuilder;
 use pv_recorder::PvRecorderBuilder;
 
 const MODULE_NAME: &'static str = "wake-word";
@@ -16,18 +16,35 @@ async fn main() -> Result<(), Error> {
     let module = InterfaceModule::new(MODULE_NAME.to_string()).await?;
     let mut publisher = module.connection.publisher;
     let access_key = module.config.get_module_value("porcupine_access_key".to_string()).expect("Porcupine access-key not found");
+    let library_path = module.config.get_module_value("library_path".to_string());
+    let mut porcupine_library_path = None;
+    let mut recorder_library_path = None;
+    if library_path.is_some() {
+        let library_path = library_path.unwrap();
+        porcupine_library_path = Some(library_path.clone() + "libpv_porcupine.so");
+        recorder_library_path = Some(library_path.clone() + "libpv_recorder.so");
+    }
+    porcupine_library_path = module.config.get_module_value("porcupine_library_path".to_string()).or(porcupine_library_path);
+    recorder_library_path = module.config.get_module_value("recorder_library_path".to_string()).or(recorder_library_path);
+
     let ppn_model = module.config.get_module_value("ppn_model".to_string()).expect("Porcupine model file not found");
     let lang_model = module.config.get_module_value("lang_model".to_string()).expect("Porcupine model file not found");
     let callback_topic = module.config.get_module_value("callback_topic".to_string()).expect("Callback not found");
 
-    let porcupine: Porcupine = PorcupineBuilder::
-        //new_with_keywords(access_key, &[BuiltinKeywords::Porcupine])
-        new_with_keyword_paths(access_key, &[ppn_model])
-        .model_path(lang_model)
+    let mut porcupine_builder = PorcupineBuilder::
+        new_with_keyword_paths(access_key, &[ppn_model]);
+    let porcupine = match porcupine_library_path {
+        Some(lib) => porcupine_builder.library_path(lib),
+        None => &mut porcupine_builder
+    }.model_path(lang_model)
         .init().expect("Unable to create Porcupine");
 
-    let recorder = PvRecorderBuilder::new(porcupine.frame_length() as i32)
-        .device_index(0)
+    let mut recorder_builder = PvRecorderBuilder::
+        new(porcupine.frame_length() as i32);
+    let recorder = match recorder_library_path {
+        Some(lib) => recorder_builder.library_path(lib.as_ref()),
+        None => &mut recorder_builder
+    }.device_index(0)
         .init()
         .expect("Failed to initialize pvrecorder");
     recorder.start().expect("Failed to start audio recording");
