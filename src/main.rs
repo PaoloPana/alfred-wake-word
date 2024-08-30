@@ -26,6 +26,7 @@ async fn main() -> Result<(), Error> {
     }
     porcupine_library_path = module.config.get_module_value("porcupine_library_path".to_string()).or(porcupine_library_path);
     recorder_library_path = module.config.get_module_value("recorder_library_path".to_string()).or(recorder_library_path);
+    let device_name = module.config.get_module_value("device_name".to_string());
 
     let ppn_model = module.config.get_module_value("ppn_model".to_string()).expect("Porcupine model file not found");
     let lang_model = module.config.get_module_value("lang_model".to_string()).expect("Porcupine model file not found");
@@ -41,12 +42,19 @@ async fn main() -> Result<(), Error> {
 
     let mut recorder_builder = PvRecorderBuilder::
         new(porcupine.frame_length() as i32);
-    let recorder = match recorder_library_path {
+    let recorder_builder = match recorder_library_path {
         Some(lib) => recorder_builder.library_path(lib.as_ref()),
         None => &mut recorder_builder
-    }.device_index(0)
+    };
+    let device_index = match device_name {
+        Some(device_name) => recorder_builder.get_available_devices().unwrap().iter().position(|el| el.as_str() == device_name).unwrap() as i32,
+        None => 0
+    };
+    debug!("{:?}", recorder_builder.get_available_devices().unwrap());
+    let recorder = recorder_builder.device_index(device_index)
         .init()
         .expect("Failed to initialize pvrecorder");
+
     recorder.start().expect("Failed to start audio recording");
 
     debug!("Listening for wake words...");
