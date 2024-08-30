@@ -1,4 +1,3 @@
-use std::collections::LinkedList;
 use alfred_rs::error::Error;
 use alfred_rs::interface_module::InterfaceModule;
 use alfred_rs::log::debug;
@@ -54,7 +53,7 @@ async fn main() -> Result<(), Error> {
         Some(device_name) => recorder_builder.get_available_devices().unwrap().iter().position(|el| el.as_str() == device_name).unwrap() as i32,
         None => 0
     };
-    debug!("{:?}", recorder_builder.get_available_devices().unwrap());
+    debug!("Devices available: {:?}", recorder_builder.get_available_devices().unwrap());
     let recorder = recorder_builder.device_index(device_index)
         .init()
         .expect("Failed to initialize pvrecorder");
