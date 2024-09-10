@@ -1,8 +1,8 @@
+use alfred_rs::connection::Sender;
 use alfred_rs::error::Error;
 use alfred_rs::interface_module::InterfaceModule;
 use alfred_rs::log::debug;
 use alfred_rs::message::{Message, MessageType};
-use alfred_rs::module::Module;
 use alfred_rs::tokio;
 use porcupine::PorcupineBuilder;
 use pv_recorder::PvRecorderBuilder;
