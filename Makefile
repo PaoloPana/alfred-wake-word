@@ -10,6 +10,11 @@ aarch64:
 install: clean-bin build
 	mkdir bin
 	cp target/debug/${BIN_FILE} bin/
+	cp target/debug/build/pv_porcupine-*/out/lib/linux/x86_64/libpv_porcupine.so bin/libpv_porcupine.so
+	cp target/debug/build/pv_recorder-*/out/lib/linux/x86_64/libpv_recorder.so bin/libpv_recorder.so
+	mkdir bin/models
+	cp models/alfred_it_linux_v3_0_0.ppn bin/models/alfred_it_linux_v3_0_0.ppn
+	cp models/porcupine_params_it.pv bin/models/porcupine_params_it.pv
 install-aarch64: clean-bin aarch64
 	mkdir bin
 	cp target/aarch64-unknown-linux-gnu/release/${BIN_FILE} bin/
