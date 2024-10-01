@@ -7,7 +7,7 @@ use alfred_rs::tokio;
 use porcupine::PorcupineBuilder;
 use pv_recorder::PvRecorderBuilder;
 
-const MODULE_NAME: &'static str = "wake-word";
+const MODULE_NAME: &'static str = "wake_word";
 
 fn get_libraries(module: &InterfaceModule) -> (Option<String>, Option<String>) {
     let library_path = module.config.get_module_value("library_path".to_string());
