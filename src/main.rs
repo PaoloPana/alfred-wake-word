@@ -10,7 +10,7 @@ use pv_recorder::PvRecorderBuilder;
 const MODULE_NAME: &'static str = "wake_word";
 
 fn get_libraries(module: &InterfaceModule) -> (Option<String>, Option<String>) {
-    let library_path = module.config.get_module_value("library_path".to_string());
+    let library_path = module.config.get_module_value("library_path");
     let mut porcupine_library_path = None;
     let mut recorder_library_path = None;
     if library_path.is_some() {
@@ -19,21 +19,21 @@ fn get_libraries(module: &InterfaceModule) -> (Option<String>, Option<String>) {
         recorder_library_path = Some(library_path.clone() + "libpv_recorder.so");
     }
     (
-        module.config.get_module_value("porcupine_library_path".to_string()).or(porcupine_library_path),
-        module.config.get_module_value("recorder_library_path".to_string()).or(recorder_library_path)
+        module.config.get_module_value("porcupine_library_path").or(porcupine_library_path),
+        module.config.get_module_value("recorder_library_path").or(recorder_library_path)
     )
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     env_logger::init();
-    let mut module = InterfaceModule::new(MODULE_NAME.to_string()).await?;
-    let access_key = module.config.get_module_value("porcupine_access_key".to_string()).expect("Porcupine access-key not found");
+    let mut module = InterfaceModule::new(MODULE_NAME).await?;
+    let access_key = module.config.get_module_value("porcupine_access_key").expect("Porcupine access-key not found");
     let (porcupine_library_path, recorder_library_path) = get_libraries(&module);
-    let device_name = module.config.get_module_value("device_name".to_string());
+    let device_name = module.config.get_module_value("device_name");
 
-    let ppn_model = module.config.get_module_value("ppn_model".to_string()).expect("Porcupine model file not found");
-    let lang_model = module.config.get_module_value("lang_model".to_string()).expect("Porcupine model file not found");
+    let ppn_model = module.config.get_module_value("ppn_model").expect("Porcupine model file not found");
+    let lang_model = module.config.get_module_value("lang_model").expect("Porcupine model file not found");
 
     let mut porcupine_builder = PorcupineBuilder::
         new_with_keyword_paths(access_key, &[ppn_model]);
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Error> {
         if keyword_index >= 0 {
             let mut message = Message::empty();
             message.message_type = MessageType::AUDIO;
-            module.send_event(MODULE_NAME.to_string(), "triggered".to_string(), &message).await?;
+            module.send_event(MODULE_NAME, "triggered", &message).await?;
             debug!("Detected {}", keyword_index);
         }
     }
