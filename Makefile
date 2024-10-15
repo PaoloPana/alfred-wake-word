@@ -17,7 +17,7 @@ install-aarch64: clean-bin aarch64
 	mkdir bin
 	cp target/aarch64-unknown-linux-gnu/release/${BIN_FILE} bin/
 	cp target/aarch64-unknown-linux-gnu/release/build/pv_porcupine-*/out/lib/raspberry-pi/cortex-a53-aarch64/libpv_porcupine.so bin/libpv_porcupine.so
-	cp target/aarch64-unknown-linux-gnu/release/build/pv_recorder-507fd7d37a2f5f71/out/lib/raspberry-pi/cortex-a53-aarch64/libpv_recorder.so bin/libpv_recorder.so
+	cp target/aarch64-unknown-linux-gnu/release/build/pv_recorder-*/out/lib/raspberry-pi/cortex-a53-aarch64/libpv_recorder.so bin/libpv_recorder.so
 	cp -r models bin/models
 
 clean: clean-target clean-bin
