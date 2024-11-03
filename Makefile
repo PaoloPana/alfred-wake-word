@@ -1,4 +1,5 @@
 BIN_FILE := alfred-wake-word
+LINT_PARAMS := $(shell cat .lints | cut -f1 -d"#" | tr '\n' ' ')
 
 build:
 	cargo build
@@ -25,3 +26,9 @@ clean-target:
 	rm -rf target
 clean-bin:
 	rm -rf bin
+
+clippy:
+	cargo clippy --all-targets --all-features -- -D warnings $(LINT_PARAMS)
+
+clippy-fix:
+	__CARGO_FIX_YOLO=1 cargo clippy --fix --allow-staged -- -D warnings $(LINT_PARAMS)
