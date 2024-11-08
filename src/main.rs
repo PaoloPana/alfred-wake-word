@@ -1,5 +1,5 @@
 use alfred_rs::connection::Sender;
-use alfred_rs::interface_module::InterfaceModule;
+use alfred_rs::AlfredModule;
 use alfred_rs::log::{debug, warn};
 use alfred_rs::message::{Message, MessageType};
 use alfred_rs::tokio;
@@ -8,7 +8,7 @@ use pv_recorder::PvRecorderBuilder;
 
 const MODULE_NAME: &str = "wake_word";
 
-fn get_libraries(module: &InterfaceModule) -> (Option<String>, Option<String>) {
+fn get_libraries(module: &AlfredModule) -> (Option<String>, Option<String>) {
     let library_path = module.config.get_module_value("library_path");
     let porcupine_library_path = library_path.clone().map(|path| path + "libpv_porcupine.so");
     let recorder_library_path = library_path.map(|path| path + "libpv_recorder.so");
@@ -21,7 +21,7 @@ fn get_libraries(module: &InterfaceModule) -> (Option<String>, Option<String>) {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    let mut module = InterfaceModule::new(MODULE_NAME).await?;
+    let mut module = AlfredModule::new(MODULE_NAME).await?;
     let access_key = module.config.get_module_value("porcupine_access_key").expect("Porcupine access-key not found");
     let (porcupine_library_path, recorder_library_path) = get_libraries(&module);
     let device_name = module.config.get_module_value("device_name");
@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(keyword_index) => {
                 if keyword_index >= 0 {
                     let mut message = Message::empty();
-                    message.message_type = MessageType::AUDIO;
+                    message.message_type = MessageType::Audio;
                     module
                         .send_event(MODULE_NAME, "triggered", &message)
                         .await?;
