@@ -20,7 +20,7 @@ fn get_libraries(module: &AlfredModule) -> (Option<String>, Option<String>) {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    let mut module = AlfredModule::new(MODULE_NAME).await?;
+    let mut module = AlfredModule::new(MODULE_NAME, env!("CARGO_PKG_VERSION")).await?;
     let access_key = module.config.get_module_value("porcupine_access_key").expect("Porcupine access-key not found");
     let (porcupine_library_path, recorder_library_path) = get_libraries(&module);
     let device_name = module.config.get_module_value("device_name");
