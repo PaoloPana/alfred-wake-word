@@ -1,7 +1,7 @@
-use alfred_rs::AlfredModule;
-use alfred_rs::log::{debug, warn};
-use alfred_rs::message::{Message, MessageType};
-use alfred_rs::tokio;
+use alfred_core::AlfredModule;
+use alfred_core::log::{debug, warn};
+use alfred_core::message::{Message, MessageType};
+use alfred_core::tokio;
 use porcupine::PorcupineBuilder;
 use pv_recorder::PvRecorderBuilder;
 
