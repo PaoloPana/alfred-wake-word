@@ -12,5 +12,6 @@ OUT_FOLDER=$NAME
 BIN_FOLDER="target/${ARCH}-unknown-linux-gnu/release"
 mkdir $OUT_FOLDER
 cp $BIN_FOLDER/$NAME $OUT_FOLDER/
+cp -r models $OUT_FOLDER/
 cd $OUT_FOLDER
 tar czf ../${NAME}_${ARCH}.tar.gz *
