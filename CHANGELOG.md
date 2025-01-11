@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased] - yyyy-mm-dd
+
 ## [0.3.0] - 2025-01-11
 ### Added
 - Added models folder to release archive
