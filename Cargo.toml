@@ -4,10 +4,10 @@ version = "0.4.0"
 edition = "2021"
 
 [dependencies]
-pv_porcupine = "3.0.3"
-pv_recorder = "1.2.2"
-alfred-core = "0.1"
-env_logger = "0.11.5"
+pv_porcupine = "3.0"
+pv_recorder = "1.2"
+alfred-core = "0.2"
+env_logger = "0.11"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }
