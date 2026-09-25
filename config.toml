@@ -4,7 +4,5 @@ pub_port = 5678
 sub_port = 1234
 
 [wake-word]
-porcupine_access_key = ""
 device_name = ""
-ppn_model = "models/alfred_it_mac_v3_0_0.ppn"
-lang_model = "models/porcupine_params_it.pv"
+wakeword_model = "models/alfred.rpw"

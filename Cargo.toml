@@ -4,7 +4,9 @@ version = "0.4.0"
 edition = "2021"
 
 [dependencies]
-pv_porcupine = "3.0.3"
+rustpotter = "3.0.2"
+# candle-core 0.2 (used by rustpotter) does not build with half >= 2.5
+half = "~2.4"
 cpal = "0.18"
 alfred-core = "0.1"
 env_logger = "0.11.5"
