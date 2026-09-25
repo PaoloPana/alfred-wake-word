@@ -1,20 +1,18 @@
+mod recorder;
+
 use alfred_core::AlfredModule;
 use alfred_core::log::{debug, warn};
 use alfred_core::message::{Message, MessageType};
 use alfred_core::tokio;
 use porcupine::PorcupineBuilder;
-use pv_recorder::PvRecorderBuilder;
+use crate::recorder::Recorder;
 
 const MODULE_NAME: &str = "wake_word";
 
-fn get_libraries(module: &AlfredModule) -> (Option<String>, Option<String>) {
+fn get_porcupine_library(module: &AlfredModule) -> Option<String> {
     let library_path = module.config.get_module_value("library_path");
-    let porcupine_library_path = library_path.clone().map(|path| path + "libpv_porcupine.so");
-    let recorder_library_path = library_path.map(|path| path + "libpv_recorder.so");
-    (
-        module.config.get_module_value("porcupine_library_path").or(porcupine_library_path),
-        module.config.get_module_value("recorder_library_path").or(recorder_library_path),
-    )
+    module.config.get_module_value("porcupine_library_path")
+        .or_else(|| library_path.map(|path| path + "libpv_porcupine.so"))
 }
 
 #[tokio::main]
@@ -22,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let mut module = AlfredModule::new(MODULE_NAME, env!("CARGO_PKG_VERSION")).await?;
     let access_key = module.config.get_module_value("porcupine_access_key").expect("Porcupine access-key not found");
-    let (porcupine_library_path, recorder_library_path) = get_libraries(&module);
+    let porcupine_library_path = get_porcupine_library(&module);
     let device_name = module.config.get_module_value("device_name");
 
     let ppn_model = module.config.get_module_value("ppn_model").expect("Porcupine model file not found");
@@ -37,28 +35,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .init()
     .expect("Unable to create Porcupine");
 
-    let mut recorder_builder = PvRecorderBuilder::new(i32::try_from(porcupine.frame_length())?);
-    let recorder_builder = match recorder_library_path {
-        Some(lib) => recorder_builder.library_path(lib.as_ref()),
-        None => &mut recorder_builder,
-    };
-    let device_index = device_name.map_or(0, |device_name| {
-        i32::try_from(recorder_builder
-            .get_available_devices()
-            .expect("Devices not found")
-            .iter()
-            .position(|el| el.as_str() == device_name)
-            .expect("Device name not found"))
-            .expect("Device index not found")
-    });
     debug!(
         "Devices available: {:?}",
-        recorder_builder.get_available_devices().expect("Unable to get the list of available devices")
+        Recorder::available_devices().expect("Unable to get the list of available devices")
     );
-    let recorder = recorder_builder
-        .device_index(device_index)
-        .init()
-        .expect("Failed to initialize pvrecorder");
+    let recorder = Recorder::new(device_name.as_deref(), usize::try_from(porcupine.frame_length())?)
+        .expect("Failed to initialize recorder");
 
     recorder.start().expect("Failed to start audio recording");
 
@@ -77,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     module
                         .send_event(MODULE_NAME, "triggered", &message)
                         .await?;
-                    debug!("Detected {}", keyword_index);
+                    debug!("Detected {keyword_index}");
                 }
             }
         }

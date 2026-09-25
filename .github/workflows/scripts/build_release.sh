@@ -14,6 +14,5 @@ mkdir $OUT_FOLDER
 cp $BIN_FOLDER/$NAME $OUT_FOLDER/
 cp -r models $OUT_FOLDER/
 cp -r $BIN_FOLDER/build/pv_porcupine-*/out/lib $OUT_FOLDER/models/libpv_porcupine
-cp -r $BIN_FOLDER/build/pv_recorder-*/out/lib $OUT_FOLDER/models/libpv_recorder
 cd $OUT_FOLDER
 tar czf ../${NAME}_${ARCH}.tar.gz *
